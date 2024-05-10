@@ -1,0 +1,10 @@
+@import "//at.alicdn.com/t/c/font_4534605_30z227hyrfz.css";
+@font-face {
+    font-family: 'JuneT-zh';
+    src: url("/src/assets/fonts/也字工厂快乐星球体.ttf") format('truetype');
+}
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'JuneT-zh', sans-serif;
+}
