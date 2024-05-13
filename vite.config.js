@@ -7,5 +7,6 @@ export default defineConfig({
   server:{
     port:2269
   },
-  publicDir:'/'
+  // publicDir:'/',
+  // outDir:'/dist',
 })

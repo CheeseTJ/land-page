@@ -14,10 +14,9 @@ class App extends Component {
             bgImg: "",
             imgLoaded: true,
             showBg: store.showBg,
-            newInx:null
         };
         // methods
-        this.getImgs=()=> {
+        this.getImgs = () => {
             let cacheImgs = localStorage.getItem("bgImgs");
             if (cacheImgs) {
                 this.imgs = JSON.parse(cacheImgs);
@@ -26,7 +25,7 @@ class App extends Component {
                 })
                 return;
             }
-            fetch('/public/export_urls.csv').then(res => res.text()).then(data => {
+            fetch('/export_urls.csv').then(res => res.text()).then(data => {
                 this.imgs = data.split('\n').map(i => i.split(',')[1].replaceAll('"', ""))
                 this.imgs.shift()
                 this.setState({
@@ -52,9 +51,21 @@ class App extends Component {
         this.refreshImg = () => {
             localStorage.removeItem('nowInx');
             localStorage.removeItem('lockInx');
-            this.setState({
-                bgImg:this.setImg()
-            } )
+            this.setState({bgImg: ''}, () => this.setState({bgImg: this.setImg()}))
+        }
+        this.downloadBgImg = () => {
+            // a.remove();
+            fetch(this.state.bgImg).then(res =>
+                res.blob()
+            ).then((blob) => {
+                let objectUrl = URL.createObjectURL(blob); // 创建 url 对象
+                let a = document.createElement('a');
+                a.href = objectUrl;
+                a.download = 'bg.jpg';
+                a.click();
+            }).catch((err) => {
+                console.error('Request Failed', err)
+            })
         }
         // computed
         this.getRandomInx = () => Math.round(Math.random() * this.imgs.length);
@@ -66,6 +77,7 @@ class App extends Component {
             })
         })
     }
+
     // init
     componentDidMount() {
         this.state.showBg && this.getImgs();
@@ -79,8 +91,8 @@ class App extends Component {
                      style={{opacity: this.state.showBg ? 1 : 0, pointerEvents: this.state.showBg ? 'all' : 'none'}}
                      src={this.state.bgImg} alt=""/>
                 <Header></Header>
-                <Content newInx={this.state.newInx} refreshImg={this.refreshImg}></Content>
-                <Footer></Footer>
+                <Content refreshImg={this.refreshImg} downloadBgImg={this.downloadBgImg}></Content>
+                {/*<Footer></Footer>*/}
             </div>
         )
     }

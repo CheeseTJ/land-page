@@ -4,6 +4,8 @@ import {gsap} from 'gsap';
 import { reaction} from "mobx";
 import {store} from "../../store/default.js";
 import TButton from "../../components/TButton/TButton.jsx";
+import personSvg from '../../assets/person.svg'
+import whiteBgSvg from '../../assets/whiteBg.svg'
 export default class content extends Component {
     constructor(props) {
         super(props);
@@ -47,7 +49,7 @@ export default class content extends Component {
                 zh: '必应'
             },
             icon: 'biying',
-            url: 'https://www.baidu.com/s?wd=',
+            url: 'https://cn.bing.com/search?q=',
             placeholder: {
                 en: 'Type here...',
                 zh: '必应一下'
@@ -72,9 +74,17 @@ export default class content extends Component {
             prop:'setShowBg',
             value:store.showBg,
             type:'btn'
+        },{
+            title: {
+                en: 'Show ImgControler always',
+                zh: '常显图片控件'
+            },
+            prop:'setShowControl',
+            value:store.showControl,
+            type:'btn'
         }]
         this.mask = null;
-        this.trans = ['.color1', '.color2', '.color3', '.icon-liebiao'];
+        this.trans = ['.color1', '.color2', '.color3', '.icon-shezhi'];
         this.bgImg = null;
         this.state = {
             flag: true,
@@ -83,9 +93,10 @@ export default class content extends Component {
             keyWord: '',
             isEN: store.isEN,
             lockInx:JSON.parse(localStorage.getItem("lockInx")??'null'),
+            showControl:store.showControl,
             showSetting:false
         }
-        this.watchList = ['showBg','isEN']
+        this.watchList = ['showBg','isEN','showControl']
         //methods
         this.bindSvg = (e) => {
             this.svgDom = e.target.contentDocument.querySelector('#person')
@@ -102,17 +113,15 @@ export default class content extends Component {
         }
         this.handleLock=(lock)=>{
             if(lock){
-                localStorage.setItem('lockInx',this.props.newInx);
+                let nowInx = localStorage.getItem('nowInx').split(',')[0];
+                localStorage.setItem('lockInx',nowInx);
                 this.setState({
-                    lockInx:this.props.newInx
+                    lockInx:nowInx
                 })
             }else{
-                // now here  --locker
                 localStorage.removeItem('lockInx');
                 this.setState({
-                    lockInx:undefined
-                },()=>{
-                    console.log(this.unLock())
+                    lockInx:null
                 })
             }
         }
@@ -147,8 +156,17 @@ export default class content extends Component {
         }
         this.doSearch = () => {
             window.open(this.state.selItem.url + this.state.keyWord)
+            this.setState({
+                keyWord: ''
+            })
         }
         this.showBg = (e) => {
+            if(this.state.showSetting){
+                this.setState({
+                    showSetting:false
+                })
+                return
+            }
             gsap.to('.person', {y: '100%', duration: .7})
             gsap.to('.whiteBg', {x: 800, y: -800, duration: .7})
             gsap.to('#header', {top: -100, duration: 1})
@@ -156,7 +174,7 @@ export default class content extends Component {
             gsap.to('.lockArea', {y:-100, duration: .5,delay:.3,onComplete:()=>{
                     gsap.to('.lockArea', {y:0, duration: .5,delay:2.3});
             }});
-            gsap.to('.bgBtn',{y:-100,duration:.5});
+            this.state.showControl || gsap.to('.bgBtn',{y:-100,duration:.5});
             this.trans.forEach(i => {
                 gsap.to(i, {x: this.randomPx(), y: this.randomPx(), scale: this.randomSize(), opacity: 0, duration: 1});
             })
@@ -165,9 +183,11 @@ export default class content extends Component {
             gsap.to('.person', {y: 0, duration: .7})
             gsap.to('.whiteBg', {x: 0, y: 0, duration: .7})
             gsap.to('#header', {top: 0, duration: 1})
-            gsap.to('.search', {z: 0, opacity: 1, duration: .3})
+            gsap.to('.search', {z: 0, opacity: 1, duration: .3,onComplete:()=>{
+                    document.querySelector('.search').style='';
+            }})
             gsap.to('.lockArea', {y:0, duration: .5,delay:.3});
-            gsap.to('.bgBtn',{y:0,duration:.5});
+            this.state.showControl ||gsap.to('.bgBtn',{y:0,duration:.5});
             this.trans.forEach(i => {
                 gsap.to(i, {x: 0, y: 0, scale: 1, opacity: 1, duration: 1});
             })
@@ -185,19 +205,23 @@ export default class content extends Component {
             settingItem.value = nval;
             localStorage.setItem('showBg',nval)
         }
+        this.toggleSettingShow = () =>{
+            this.setState({
+                showSetting:!this.state.showSetting
+            })
+        }
         // computed
         this.i18n = (obj) => obj[this.state.isEN ? 'en' : 'zh'];
-        this.unLock = () =>this.state.lockInx ?? true;
+        this.isLock = () =>this.state.lockInx ?? false;
         this.randomPx = () => (Math.round(Math.random() * 500) + 100) * (Math.round(Math.random()) ? 1 : -1);
         this.randomSize = () => (Math.round(Math.random() * 20) / 10);
-        console.log(this.unLock(),96)
         // watch
         reaction(() => this.watchList.map(i=>store[i]), (nval) => {
             let nstate={}
             this.watchList.forEach((i,inx)=>{
                nstate[i]=nval[inx]
             })
-            this.setState(nstate)
+            this.setState(nstate);
         })
     }
 
@@ -217,20 +241,12 @@ export default class content extends Component {
                         <span className="color1"></span>
                         <span className="color2"></span>
                         <span className="color3"></span>
-                        <i className="iconfont icon-shezhi" onClick={()=>this.setState({
-                            showSetting:true
-                        })}> </i>
-                        <div className={`settingList ${this.state.showSetting?'act':''}`} onMouseLeave={()=>this.setState({
-                            showSetting:false
-                        })}>{
-                            this.settingList.map((i, inx) => <div key={inx} className={'settingItem'}>
-                                <span>{this.i18n(i.title)}</span>
-                                <TButton value={i.value} handleClick={()=>this.btnClick(i)}></TButton>
-                            </div>)
-                        }</div>
+                        <i className="iconfont icon-shezhi" onClick={this.toggleSettingShow}></i>
                     </div>
-                    <object data="/src/assets/person.svg" className="person" onLoad={this.bindSvg}
-                            type="image/svg+xml"></object>
+
+                    <object data={personSvg} className="person" onLoad={this.bindSvg}
+                            type="image/svg+xml">
+                    </object>
                     <div className="search">
                         <div className="searchList" onMouseLeave={() => this.showSearchList(false)}>
                             <div className="searchItemMask"></div>
@@ -246,16 +262,22 @@ export default class content extends Component {
                                onKeyDown={this.pressEnter} placeholder={this.i18n(this.state.selItem.placeholder)}/>
                         <i className="iconfont icon-sousuo" onClick={this.doSearch}></i>
                     </div>
-                    <img src="/src/assets/whiteBg.svg" draggable={false} className='whiteBg' alt=''/>
+                    <img src={whiteBgSvg} draggable={false} className='whiteBg' alt=''/>
                 </div>
                 <div className="lockArea">
-                    {this.i18n({en:'Drag here to lock',zh:'拖动这里锁定图片'})}
+                    {this.i18n({en: 'Drag here to lock', zh: '拖动这里锁定图片'})}
                 </div>
-                <div className="bgBtn">
-                    <i className={`iconfont icon-suoding ${this.unLock()?'act':''}`} onClick={()=>this.handleLock(false)}></i>
-                    <i className={`iconfont icon-jiesuo ${!this.unLock()?'act':''}`} onClick={()=>this.handleLock(true)}></i>
+                <div className={`settingList ${this.state.showSetting ? 'act' : ''}`}>{
+                    this.settingList.map((i, inx) => <div key={inx} className={'settingItem'}>
+                        <span>{this.i18n(i.title)}</span>
+                        <TButton value={i.value} handleClick={() => this.btnClick(i)}></TButton>
+                    </div>)
+                }</div>
+                <div className={`bgBtn ${this.state.showControl?'alwaysShow':''}`}>
+                    <i className={`iconfont ${this.isLock() ? 'icon-suoding' : 'icon-jiesuo'}`}
+                       onClick={() => this.handleLock(!this.isLock())}></i>
                     <i className="iconfont icon-shuaxin" onClick={this.props.refreshImg}></i>
-                    <i className="iconfont icon-xiazai"></i>
+                    <i className="iconfont icon-xiazai" onClick={this.props.downloadBgImg}></i>
                 </div>
             </div>
         )
