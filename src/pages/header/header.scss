@@ -1,0 +1,74 @@
+#header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99;
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+
+  .menu {
+    display: flex;
+    margin-left: auto;
+    gap: 25px;
+    width: fit-content;
+    align-items: center;
+    margin-right: 50px;
+    padding: 20px;
+    .menuItem {
+      width: fit-content;
+      height: 30px;
+      cursor: pointer;
+      font-size: 30px;
+      position: relative;
+      &.act:after {
+        position: absolute;
+        content: '';
+        display: block;
+        height: 5px;
+        border-radius: 4px;
+        background-color: aquamarine;
+        width: 100%;
+        left: 0;
+        bottom: -10px;
+      }
+      &:hover:before{
+        position: absolute;
+        content: '';
+        display: block;
+        height: 5px;
+        border-radius: 4px;
+        background-color: aquamarine;
+        bottom: -10px;
+        width: 0;
+        animation:hoverLine 1s 1;
+      }
+      @keyframes hoverLine {
+        0% {
+          left: 0;
+        }
+        48%{
+          width: 100%;
+          left: 0;
+        }
+        50%{
+          width: 100%;
+          left: unset;
+          right: 0;
+        }
+        52%{
+          width: 100%;
+          right: 0;
+        }
+        100%{
+          width: 0;
+          right: 0;
+        }
+      }
+      svg {
+        width: 30px;
+        height: 30px;
+      }
+    }
+  }
+}

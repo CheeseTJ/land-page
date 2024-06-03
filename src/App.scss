@@ -1,0 +1,18 @@
+#App{
+    background-color: rgb(67, 106, 145);
+    width: 100vw;
+    height: 100vh;
+    background-size:cover ;
+    background-repeat: no-repeat;
+    #bgImg{
+        cursor: pointer;
+        position: fixed;
+        transition: all .7s;
+        width: 100vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        object-fit: cover;
+    }
+}
+
