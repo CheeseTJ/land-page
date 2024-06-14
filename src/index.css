@@ -1,7 +1,7 @@
 @import "//at.alicdn.com/t/c/font_4534605_udlaggnij7.css";
 @font-face {
     font-family: 'JuneT-zh';
-    src: url("./assets/fonts/也字工厂快乐星球体.ttf") format('truetype');
+    src: url("assets/fonts/zh.ttf") format('truetype');
 }
 *{
     margin: 0;
