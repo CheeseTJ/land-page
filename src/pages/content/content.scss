@@ -94,7 +94,6 @@ $path: '../../assets/';
       align-items: center;
       padding: 0 10px;
       background-color: rgba(255, 255, 255, .8);
-
       &:hover, &:focus-within {
         z-index: 3;
         transform: translateZ(30px) rotateY(-3deg);
@@ -152,6 +151,7 @@ $path: '../../assets/';
         outline: none;
         font-size: 16px;
         background-color: transparent;
+        text-indent: 3px;
       }
 
       i {
