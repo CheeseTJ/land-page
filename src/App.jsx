@@ -26,7 +26,7 @@ class App extends Component {
                 return;
             }
             fetch('/export_urls.csv').then(res => res.text()).then(data => {
-                this.imgs = data.split('\n').map(i => i.split(',')[1].replaceAll('"', ""))
+                this.imgs = data.split('\n').map(i=>i.replace('\r',''));
                 this.imgs.shift()
                 this.setState({
                     bgImg: this.setImg()

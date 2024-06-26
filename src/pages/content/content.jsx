@@ -160,6 +160,7 @@ export default class content extends Component {
                 keyWord: ''
             })
         }
+        let timer = null;
         this.showBg = (e) => {
             if(this.state.showSetting){
                 this.setState({
@@ -167,19 +168,22 @@ export default class content extends Component {
                 })
                 return
             }
-            gsap.to('.person', {y: '100%', duration: .7})
-            gsap.to('.whiteBg', {x: 800, y: -800, duration: .7})
-            gsap.to('#header', {top: -100, duration: 1})
-            gsap.to('.search', {z: -100, opacity: 0, duration: .3});
-            gsap.to('.lockArea', {y:-100, duration: .5,delay:.3,onComplete:()=>{
-                    gsap.to('.lockArea', {y:0, duration: .5,delay:2.3});
-            }});
-            this.state.showControl || gsap.to('.bgBtn',{y:-100,duration:.5});
-            this.trans.forEach(i => {
-                gsap.to(i, {x: this.randomPx(), y: this.randomPx(), scale: this.randomSize(), opacity: 0, duration: 1});
-            })
+            timer = setTimeout(()=>{
+                gsap.to('.person', {y: '100%', duration: .7})
+                gsap.to('.whiteBg', {x: 800, y: -800, duration: .7})
+                gsap.to('#header', {top: -100, duration: 1})
+                gsap.to('.search', {z: -100, opacity: 0, duration: .3});
+                gsap.to('.lockArea', {y:-100, duration: .5,delay:.3,onComplete:()=>{
+                        gsap.to('.lockArea', {y:0, duration: .5,delay:2.3});
+                }});
+                this.state.showControl || gsap.to('.bgBtn',{y:-100,duration:.5});
+                this.trans.forEach(i => {
+                    gsap.to(i, {x: this.randomPx(), y: this.randomPx(), scale: this.randomSize(), opacity: 0, duration: 1});
+                })
+            },200)
         }
         this.hideBg = () => {
+            clearTimeout(timer)
             gsap.to('.person', {y: 0, duration: .7})
             gsap.to('.whiteBg', {x: 0, y: 0, duration: .7})
             gsap.to('#header', {top: 0, duration: 1})
