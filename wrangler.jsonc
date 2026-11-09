@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "land-page",
+  "account_id": "1b53bebb48213cfdf6e43cd71d931741",
+  "compatibility_date": "2026-06-01",
+  // Worker 名必须与 `name` 一致，否则 CF 侧构建会失败
+  "assets": {
+    "directory": "dist",
+    // 无客户端路由，静态文件直接命中，不需要回退
+    "not_found_handling": "none"
+  },
+  // 关掉 workers.dev，只走自定义域（绑定时 wrangler 自动建 AAAA 100:: 占位）
+  "workers_dev": false,
+  "preview_urls": false,
+  // 根域与 www 都要绑（www 原来有 301 → 根域的重定向规则，迁移后需在
+  // Cloudflare 的 Redirect Rules 里保留）
+  "routes": [
+    { "pattern": "taojun.top", "custom_domain": true },
+    { "pattern": "www.taojun.top", "custom_domain": true }
+  ]
+}
